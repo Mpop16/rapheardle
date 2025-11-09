@@ -1,47 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RapHeardle</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RapHeardle</title>
+<style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #121212;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 40px;
+  }
+
+  h1 {
+    color: #1DB954;
+    font-weight: bold;
+  }
+
+  button {
+    background-color: #1DB954;
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 24px;
+    margin: 10px;
+    font-size: 16px;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background-color: #1ed760;
+  }
+
+  input[type="text"] {
+    padding: 10px;
+    width: 250px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    background-color: #181818;
+    color: #FFFFFF;
+    font-size: 16px;
+  }
+
+  #score {
+    font-weight: bold;
+    color: #1DB954;
+    font-size: 18px;
+  }
+
+  #result {
+    margin-top: 20px;
+    font-size: 18px;
+    min-height: 24px;
+  }
+
+  #hint {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #1DB954;
+  }
+
+  #nowPlaying {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #181818;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px auto;
+    max-width: 400px;
+  }
+
+  #albumArt {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    margin-right: 15px;
+  }
+
+  #trackInfo {
+    text-align: left;
+  }
+
+  #trackName {
+    font-weight: bold;
+    color: #FFFFFF;
+  }
+
+  #trackArtist {
+    color: #1DB954;
+  }
+</style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">RapHeardle</div>
-  </header>
 
-  <main class="game">
-    <section class="track-card">
-      <div class="album-art" id="albumArt" aria-hidden="true"></div>
-      <div class="track-meta">
-        <div id="trackName" class="track-title">Track Name</div>
-        <div id="trackArtist" class="track-artist">Artist Name</div>
-      </div>
-    </section>
+<h1>RapHeardle</h1>
+<p>Score: <span id="score">0</span></p>
 
-    <button id="playBtn" class="big-play" aria-label="Play snippet">
-      <span class="play-symbol">▶</span>
-    </button>
+<div id="nowPlaying">
+  <img id="albumArt" src="" alt="Album Art">
+  <div id="trackInfo">
+    <div id="trackName">Track Name</div>
+    <div id="trackArtist">Artist Name</div>
+  </div>
+</div>
 
-    <div class="progress-wrap" aria-hidden="true">
-      <div class="progress" id="progress"></div>
-    </div>
+<button id="playBtn">▶ Play Snippet</button>
+<br>
+<input type="text" id="guessInput" placeholder="Guess the song">
+<button id="guessBtn">Guess</button>
 
-    <div class="guess-area">
-      <div class="tiles" id="tiles" aria-hidden="true"></div>
-      <div class="controls">
-        <input id="guessInput" type="text" placeholder="Guess the song" autocomplete="off" />
-        <button id="guessBtn" class="guess-btn">Guess</button>
-      </div>
-    </div>
+<p id="result"></p>
+<p id="hint"></p>
 
-    <div class="feedback">
-      <div id="result" class="result"></div>
-      <div id="hint" class="hint"></div>
-    </div>
-  </main>
+<script>
+const clientId = '94fa103e1a494cfc8e85591dd59113cc';
+const redirectUri = 'https://username.github.io/rapheardle/'; // Replace with your GitHub Pages URL
+const scopes = 'user-read-private user-read-email';
+const authEndpoint = 'https://accounts.spotify.com/authorize';
 
-  <script src="script.js"></script>
+let accessToken = '';
+let currentTrack = null;
+let snippetStage = 1;
+let score = 0;
+let attempts = 0;
+
+// List of 30 rap tracks (replace placeholders with real Spotify track IDs)
+const dailyTrackIds = [
+  'CLIMAX_SLUMVILLAGE_ID',   // Climax — Slum Village
+  '4GQyN7gpOXbXNgn3LlBlme',  // Comfortable — Lil Wayne
+  '63BcfK6YAzJYeISaTPr6IO',  // Big Poppa — Notorious B.I.G.
+  '0CAJdthKDdRjB2h8YOguN6',  // What You Know — T.I.
+  '2q4rjDy9WhaN3o9MvDbO21',  // Kiss Me Thru the Phone — Soulja Boy
+  'TRACK_ID_6',
+  'TRACK_ID_7',
+  'TRACK_ID_8',
+  'TRACK_ID_9',
+  'TRACK_ID_10',
+  'TRACK_ID_11',
+  'TRACK_ID_12',
+  'TRACK_ID_13',
+  'TRACK_ID_14',
+  'TRACK_ID_15',
+  'TRACK_ID_16',
+  'TRACK_ID_17',
+  'TRACK_ID_18',
+  'TRACK_ID_19',
+  'TRACK_ID_20',
+  'TRACK_ID_21',
+  'TRACK_ID_22',
+  'TRACK_ID_23',
+  'TRACK_ID_24',
+  'TRACK_ID_25',
+  'TRACK_ID_26',
+  'TRACK_ID_27',
+  'TRACK_ID_28',
+  'TRACK_ID_29',
+  'TRACK_ID_30'
+];
+
+// Authenticate with Spotify
+function authenticate() {
+  const urlParams = new URLSearchParams(window.location.hash.replace('#','?'));
+  if (urlParams.has('access_token')) {
+    accessToken = urlParams.get('access_token');
+    startGame();
+  } else {
+    window.location.href = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token`;
+  }
+}
+
+// Pick the track of the day starting from today
+function getDailyTrackId() {
+  const startDate = new Date(); // TODAY as start
+  const today = new Date();
+  const dayDiff = Math.floor((today - startDate) / (1000*60*60*24));
+  const index = dayDiff % dailyTrackIds.length;
+  return dailyTrackIds[index];
+}
+
+async function getDailyTrack() {
+  const trackId = getDailyTrackId();
+  const res = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  const track = await res.json();
+  return track;
+}
+
+// Update Now Playing card
+function updateNowPlaying(track) {
+  document.getElementById('albumArt').src = track.album.images[0].url;
+  document.getElementById('trackName').innerText = track.name;
+  document.getElementById('trackArtist').innerText = track.artists[0].name;
+}
+
+// Play snippet with increasing length
+function playSnippet() {
+  if (!currentTrack) return;
+  const audio = new Audio(currentTrack.preview_url);
+  audio.play();
+  setTimeout(() => audio.pause(), snippetStage * 1000);
+  if (snippetStage < 5) snippetStage++;
+}
+
+// Check guess
+function checkGuess() {
+  const guess = document.getElementById('guessInput').value.toLowerCase();
+  if (!currentTrack) return;
+  attempts++;
+  if (guess === currentTrack.name.toLowerCase()) {
+    let points = Math.max(10 - attempts * 2, 1);
+    score += points;
+    document.getElementById('score').innerText = score;
+    document.getElementById('result').innerText = `✅ Correct! "${currentTrack.name}" by ${currentTrack.artists[0].name}. +${points} points`;
+    document.getElementById('hint').innerText = '';
+    // Do NOT load new track, stay with today's track
+  } else {
+    document.getElementById('result').innerText = `❌ Wrong! Try again. Snippet will be longer.`;
+    if (attempts >= 2) {
+      document.getElementById('hint').innerText = `Hint: Artist - ${currentTrack.artists[0].name}`;
+    }
+  }
+}
+
+// Start the game
+async function startGame() {
+  currentTrack = await getDailyTrack();
+  snippetStage = 1;
+  attempts = 0;
+  document.getElementById('result').innerText = '';
+  document.getElementById('hint').innerText = '';
+  document.getElementById('guessInput').value = '';
+  updateNowPlaying(currentTrack);
+  console.log("Today's track:", currentTrack.name, currentTrack.artists[0].name);
+}
+
+// Event listeners
+document.getElementById('playBtn').addEventListener('click', playSnippet);
+document.getElementById('guessBtn').addEventListener('click', checkGuess);
+
+authenticate();
+</script>
+
 </body>
 </html>
