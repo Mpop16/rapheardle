@@ -1,0 +1,31 @@
+:root{
+  --bg:#121212;
+  --panel:#181818;
+  --muted:#9aa4b2;
+  --accent:#1DB954;
+  --card:#0f1113;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#0b0b0b,var(--bg));color:#fff}
+.site-header{height:64px;display:flex;align-items:center;padding:0 24px;background:transparent}
+.brand{font-weight:700;color:var(--accent);font-size:20px;letter-spacing:1px}
+.game{max-width:760px;margin:28px auto;padding:24px}
+.track-card{display:flex;align-items:center;gap:18px;background:var(--panel);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
+.album-art{width:104px;height:104px;border-radius:8px;background:linear-gradient(135deg,#222,#111);flex:0 0 104px}
+.track-meta{flex:1;text-align:left}
+.track-title{font-size:18px;font-weight:700}
+.track-artist{color:var(--accent);margin-top:6px}
+.big-play{margin:22px auto;display:flex;align-items:center;justify-content:center;width:120px;height:120px;border-radius:999px;background:linear-gradient(180deg,var(--accent),#17c956);border:none;box-shadow:0 8px 30px rgba(29,185,84,0.18);cursor:pointer;font-size:40px;color:#041018}
+.big-play:active{transform:scale(0.98)}
+.progress-wrap{height:6px;background:#0b0b0b;border-radius:6px;overflow:hidden;margin:16px auto;width:76%}
+.progress{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#47e07b)}
+.guess-area{margin-top:18px}
+.tiles{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+.tile{min-width:44px;height:56px;border-radius:8px;background:#0e0e0e;display:flex;align-items:center;justify-content:center;padding:6px 10px;font-weight:700}
+.controls{display:flex;gap:8px;justify-content:center}
+#guessInput{padding:12px 14px;border-radius:999px;border:1px solid #232323;background:var(--card);color:#fff;outline:none;width:320px}
+.guess-btn{padding:12px 18px;border-radius:999px;border:none;background:var(--accent);color:#041018;font-weight:700;cursor:pointer}
+.feedback{margin-top:16px;text-align:center}
+.result{font-weight:700}
+.hint{color:var(--accent);margin-top:6px}
+@media (max-width:520px){.big-play{width:96px;height:96px;font-size:30px}.track-card{padding:10px}.album-art{width:84px;height:84px}}
